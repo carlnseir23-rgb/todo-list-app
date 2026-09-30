@@ -34,4 +34,10 @@ Open `index.html` directly in any modern browser. No local server or build step 
 
 ## Screenshots
 
-_Add your screenshots here (empty list and list with tasks)._
+**No tasks (empty state)**
+
+![Empty to-do list](screenshots/empty.jpg)
+
+**With tasks (two completed, one still to do)**
+
+![To-do list with tasks](screenshots/with-tasks.jpg)
