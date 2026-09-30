@@ -4,6 +4,7 @@ const taskInput = document.getElementById("task-input");
 const errorMessage = document.getElementById("error-message");
 const taskList = document.getElementById("task-list");
 const emptyState = document.getElementById("empty-state");
+const taskCount = document.getElementById("task-count");
 
 // ---------- State ----------
 // Each task: { id: number, text: string, completed: boolean }
@@ -81,6 +82,19 @@ function renderTasks() {
   taskList.replaceChildren(...taskElements);
 
   emptyState.hidden = tasks.length > 0;
+  renderTaskCount();
+}
+
+function renderTaskCount() {
+  const remaining = tasks.reduce(
+    (count, task) => (task.completed ? count : count + 1),
+    0
+  );
+
+  taskCount.hidden = tasks.length === 0;
+  taskCount.textContent = `${remaining} of ${tasks.length} ${
+    tasks.length === 1 ? "task" : "tasks"
+  } remaining`;
 }
 
 // ---------- Validation feedback ----------
@@ -95,12 +109,13 @@ function clearError() {
 }
 
 // ---------- Actions ----------
+// Returns true if the task was added, false if the input was rejected.
 function addTask(text) {
   const trimmedText = text.trim();
 
   if (trimmedText === "") {
     showError("Please enter a task before adding it.");
-    return;
+    return false;
   }
 
   const newTask = {
@@ -111,6 +126,7 @@ function addTask(text) {
 
   clearError();
   updateTasks([...tasks, newTask]);
+  return true;
 }
 
 function toggleTask(id) {
@@ -130,9 +146,7 @@ function handleFormSubmit(event) {
   // The form submits on both the Add button and the Enter key.
   // preventDefault stops the browser from reloading the page.
   event.preventDefault();
-  addTask(taskInput.value);
-
-  if (errorMessage.textContent === "") {
+  if (addTask(taskInput.value)) {
     taskInput.value = "";
   }
   taskInput.focus();
