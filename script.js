@@ -83,6 +83,11 @@ function toggleTask(id) {
   renderTasks();
 }
 
+function deleteTask(id) {
+  tasks = tasks.filter((task) => task.id !== id);
+  renderTasks();
+}
+
 // ---------- Event handlers ----------
 function handleFormSubmit(event) {
   // The form submits on both the Add button and the Enter key.
@@ -106,7 +111,9 @@ function handleListClick(event) {
 
   const id = Number(taskItem.dataset.id);
 
-  if (
+  if (event.target.classList.contains("delete-btn")) {
+    deleteTask(id);
+  } else if (
     event.target.classList.contains("task-checkbox") ||
     event.target.classList.contains("task-text")
   ) {
