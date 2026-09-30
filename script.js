@@ -7,7 +7,44 @@ const emptyState = document.getElementById("empty-state");
 
 // ---------- State ----------
 // Each task: { id: number, text: string, completed: boolean }
+const STORAGE_KEY = "todo-list-tasks";
 let tasks = [];
+
+// ---------- localStorage ----------
+function saveTasks() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+  } catch (error) {
+    console.warn("Could not save tasks to localStorage:", error);
+  }
+}
+
+function loadTasks() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (!Array.isArray(saved)) {
+      return [];
+    }
+    // Keep only well-formed tasks so bad saved data can't break the app.
+    return saved.filter(
+      (task) =>
+        task &&
+        typeof task.id === "number" &&
+        typeof task.text === "string" &&
+        typeof task.completed === "boolean"
+    );
+  } catch (error) {
+    console.warn("Could not load tasks from localStorage:", error);
+    return [];
+  }
+}
+
+// Every change goes through here: save the new state, then redraw the list.
+function updateTasks(newTasks) {
+  tasks = newTasks;
+  saveTasks();
+  renderTasks();
+}
 
 // ---------- Rendering ----------
 function createTaskElement(task) {
@@ -66,26 +103,26 @@ function addTask(text) {
     return;
   }
 
-  tasks.push({
+  const newTask = {
     id: Date.now() + Math.random(),
     text: trimmedText,
     completed: false,
-  });
+  };
 
   clearError();
-  renderTasks();
+  updateTasks([...tasks, newTask]);
 }
 
 function toggleTask(id) {
-  tasks = tasks.map((task) =>
-    task.id === id ? { ...task, completed: !task.completed } : task
+  updateTasks(
+    tasks.map((task) =>
+      task.id === id ? { ...task, completed: !task.completed } : task
+    )
   );
-  renderTasks();
 }
 
 function deleteTask(id) {
-  tasks = tasks.filter((task) => task.id !== id);
-  renderTasks();
+  updateTasks(tasks.filter((task) => task.id !== id));
 }
 
 // ---------- Event handlers ----------
@@ -126,4 +163,5 @@ taskForm.addEventListener("submit", handleFormSubmit);
 taskInput.addEventListener("input", clearError);
 taskList.addEventListener("click", handleListClick);
 
+tasks = loadTasks();
 renderTasks();
