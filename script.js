@@ -46,5 +46,51 @@ function renderTasks() {
   emptyState.hidden = tasks.length > 0;
 }
 
+// ---------- Validation feedback ----------
+function showError(message) {
+  errorMessage.textContent = message;
+  taskInput.classList.add("invalid");
+}
+
+function clearError() {
+  errorMessage.textContent = "";
+  taskInput.classList.remove("invalid");
+}
+
+// ---------- Actions ----------
+function addTask(text) {
+  const trimmedText = text.trim();
+
+  if (trimmedText === "") {
+    showError("Please enter a task before adding it.");
+    return;
+  }
+
+  tasks.push({
+    id: Date.now() + Math.random(),
+    text: trimmedText,
+    completed: false,
+  });
+
+  clearError();
+  renderTasks();
+}
+
+// ---------- Event handlers ----------
+function handleFormSubmit(event) {
+  // The form submits on both the Add button and the Enter key.
+  // preventDefault stops the browser from reloading the page.
+  event.preventDefault();
+  addTask(taskInput.value);
+
+  if (errorMessage.textContent === "") {
+    taskInput.value = "";
+  }
+  taskInput.focus();
+}
+
 // ---------- Start ----------
+taskForm.addEventListener("submit", handleFormSubmit);
+taskInput.addEventListener("input", clearError);
+
 renderTasks();
