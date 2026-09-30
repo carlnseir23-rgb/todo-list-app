@@ -76,6 +76,13 @@ function addTask(text) {
   renderTasks();
 }
 
+function toggleTask(id) {
+  tasks = tasks.map((task) =>
+    task.id === id ? { ...task, completed: !task.completed } : task
+  );
+  renderTasks();
+}
+
 // ---------- Event handlers ----------
 function handleFormSubmit(event) {
   // The form submits on both the Add button and the Enter key.
@@ -89,8 +96,27 @@ function handleFormSubmit(event) {
   taskInput.focus();
 }
 
+function handleListClick(event) {
+  // One listener on the <ul> handles clicks for every task (event delegation),
+  // so re-rendering never leaves stale listeners behind.
+  const taskItem = event.target.closest(".task-item");
+  if (!taskItem) {
+    return;
+  }
+
+  const id = Number(taskItem.dataset.id);
+
+  if (
+    event.target.classList.contains("task-checkbox") ||
+    event.target.classList.contains("task-text")
+  ) {
+    toggleTask(id);
+  }
+}
+
 // ---------- Start ----------
 taskForm.addEventListener("submit", handleFormSubmit);
 taskInput.addEventListener("input", clearError);
+taskList.addEventListener("click", handleListClick);
 
 renderTasks();
